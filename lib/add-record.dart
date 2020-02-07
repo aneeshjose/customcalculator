@@ -30,6 +30,7 @@ class _AddRecordState extends State<AddRecord> {
           FlatButton(
               child: Text("Done"),
               onPressed: () {
+                print(_params);
                 bool isAllNull = true;
                 for (int j = 0; j < _controllers.length; j++) {
                   if (_controllers[j] != null) {
@@ -37,11 +38,6 @@ class _AddRecordState extends State<AddRecord> {
                       isAllNull = false;
                       break;
                     }
-                  }
-                }
-                for (int j = 0; j < _controllers.length; j++) {
-                  if (_params[j] == null) {
-                    _params.removeAt(j);
                   }
                 }
 
@@ -74,12 +70,12 @@ class _AddRecordState extends State<AddRecord> {
                     fontSize: 17.0,
                   ),
                   decoration: InputDecoration(
-                      contentPadding: EdgeInsets.all(0.0),
-                      border: OutlineInputBorder(
-                          // gapPadding: 2,
-                          borderRadius: BorderRadius.circular(10)),
-                      hintText: ""),
-                  onChanged: (text) => _params[i] = _controllers[i].text,
+                    contentPadding: EdgeInsets.all(0.0),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onChanged: (text) => _params[i] = text,
                 ),
               ),
             ),

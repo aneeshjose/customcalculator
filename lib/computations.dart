@@ -9,11 +9,21 @@ class Computations extends StatefulWidget {
 }
 
 class _ComputationsState extends State<Computations> {
-  List<Widget> _calcButtons = [];
+  List<Widget> _calcButtons = new List<Widget>();
+  String _calcString = "";
   @override
   void initState() {
     super.initState();
-    for (int j = 0; j < widget.params.length; j++) {}
+    print(widget.params);
+    for (int j = 0; j < widget.params.length; j++) {
+      _calcButtons.add(RaisedButton(
+        onPressed: () {},
+        child: Text(widget.params[j]),
+      ));
+      _calcButtons.add(Container(
+        width: 10.0,
+      ));
+    }
   }
 
   @override
@@ -28,9 +38,15 @@ class _ComputationsState extends State<Computations> {
             height: 30,
             child: ListView(
               scrollDirection: Axis.horizontal,
-              children: <Widget>[],
+              children: <Widget>[Text(_calcString)],
             ),
           ),
+          Container(
+            height: 50.0,
+          ),
+          Wrap(
+            children: _calcButtons,
+          )
         ],
       ),
     );
