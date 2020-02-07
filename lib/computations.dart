@@ -14,7 +14,7 @@ class _ComputationsState extends State<Computations> {
   @override
   void initState() {
     super.initState();
-    print(widget.params);
+    // print(widget.params);
     for (int j = 0; j < widget.params.length; j++) {
       _calcButtons.add(RaisedButton(
         onPressed: () {},

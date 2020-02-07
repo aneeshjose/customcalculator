@@ -30,7 +30,7 @@ class _AddRecordState extends State<AddRecord> {
           FlatButton(
               child: Text("Done"),
               onPressed: () {
-                print(_params);
+                // print(_params);
                 bool isAllNull = true;
                 for (int j = 0; j < _controllers.length; j++) {
                   if (_controllers[j] != null) {
@@ -88,7 +88,7 @@ class _AddRecordState extends State<AddRecord> {
             new IconButton(
               icon: Icon(Icons.remove),
               onPressed: () {
-                print(i);
+                // print(i);
                 _removeField(i);
               },
             ),
