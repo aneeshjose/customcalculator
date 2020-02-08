@@ -1,4 +1,6 @@
 import 'package:customcalc/add-record.dart';
+import 'package:customcalc/calculate.dart';
+import 'package:customcalc/core/supportclasses.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sqlite_api.dart';
@@ -25,7 +27,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Future<List> _savedOptions;
+  Future<List<Equations>> _savedOptions;
+  List<Widget> _savedWidgets = [];
 
   @override
   void initState() {
@@ -41,65 +44,106 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text("Custom Calculator"),
         actions: <Widget>[
-          FlatButton(
-            onPressed: () => Navigator.push(context,
-                MaterialPageRoute(builder: (context) => new AddRecord())),
-            child: new Text(
-              "Add new",
-              style: TextStyle(color: Colors.white),
-            ),
-            color: Colors.green[600],
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(3.0),
-                side: BorderSide(color: Colors.black)),
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: () {
+              setState(() {
+                _savedOptions = _loadSavedOptions();
+              });
+            },
+          )
+        ],
+      ),
+      body: ListView(
+        children: <Widget>[
+          FutureBuilder(
+            future: _savedOptions,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done ||
+                  snapshot.connectionState == ConnectionState.none) {
+                if (snapshot.hasData) {
+                  _savedWidgets = [];
+                  if (snapshot.data.length != 0) {
+                    for (int i = 0; i < snapshot.data.length; i++) {
+                      _savedWidgets.add(
+                        new FlatButton(
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        new Calculate(snapshot.data[i])));
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                                border: Border.all(color: Colors.green),
+                                // border: Border()
+                                borderRadius: BorderRadius.circular(5)),
+                            width: MediaQuery.of(context).size.width,
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Text(snapshot.data[i].name),
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+                    return Column(
+                      children: _savedWidgets,
+                    );
+                  }
+                  // return Text("Have prev records");
+                  else
+                    return Center(
+                      child: FlatButton(
+                        onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => new AddRecord())),
+                        child: new Text("Add new "),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(3.0),
+                            side: BorderSide(color: Colors.yellow[900])),
+                      ),
+                    );
+                } else {
+                  return Center(
+                    child: FlatButton(
+                      onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => new AddRecord())),
+                      child: new Text("Add new"),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(3.0),
+                          side: BorderSide(color: Colors.yellow[900])),
+                    ),
+                  );
+                }
+              } else {
+                // if (snapshot.connectionState == ConnectionState.active ||
+                //     snapshot.connectionState == ConnectionState.waiting)
+
+                return Text("Please wait");
+              }
+            },
           ),
         ],
       ),
-      body: FutureBuilder(
-        future: _savedOptions,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done ||
-              snapshot.connectionState == ConnectionState.none) {
-            if (snapshot.hasData) {
-              if (snapshot.data.length != 0)
-                return Text("Have prev records");
-              else
-                return Center(
-                  child: FlatButton(
-                    onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => new AddRecord())),
-                    child: new Text("Add new "),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(3.0),
-                        side: BorderSide(color: Colors.yellow[900])),
-                  ),
-                );
-            } else {
-              return Center(
-                child: FlatButton(
-                  onPressed: () => Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => new AddRecord())),
-                  child: new Text("Add new"),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(3.0),
-                      side: BorderSide(color: Colors.yellow[900])),
-                ),
-              );
-            }
-          } else {
-            // if (snapshot.connectionState == ConnectionState.active ||
-            //     snapshot.connectionState == ConnectionState.waiting)
-
-            return Text("Please wait");
-          }
+      floatingActionButton: FloatingActionButton(
+        child: Icon(
+          Icons.add,
+          size: 50.0,
+        ),
+        onPressed: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => new AddRecord()));
         },
       ),
     );
   }
 
-  Future<List> _loadSavedOptions() async {
+  Future<List<Equations>> _loadSavedOptions() async {
     List<Map> equList = [];
     List<Equations> equations = [];
     var databasesPath = await getDatabasesPath();
@@ -115,7 +159,8 @@ class _MyHomePageState extends State<MyHomePage> {
       database.close();
       // print("Future done");
       for (int i = 0; i < equList.length; i++) {
-        equations.add(Equations(equList[i]['name'], equList[i]['equation']));
+        equations.add(Equations(equList[i]['name'], equList[i]['equation'],
+            equList[i]['variables']));
       }
       return equations;
     } catch (e) {
@@ -136,7 +181,7 @@ class _MyHomePageState extends State<MyHomePage> {
       });
       Batch batch = database.batch();
       batch.execute(
-          'CREATE TABLE if not exists equations(name TEXT PRIMARY KEY,equation TEXT)');
+          'CREATE TABLE equations(name TEXT PRIMARY KEY,equation TEXT,variables TEXT)');
 
       // await db.execute("create table trades(trade text primary key)");
       await batch.commit();
@@ -144,10 +189,4 @@ class _MyHomePageState extends State<MyHomePage> {
       print(e);
     }
   }
-}
-
-class Equations {
-  String name;
-  String equation;
-  Equations(this.name, this.equation);
 }

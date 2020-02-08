@@ -1,4 +1,4 @@
-import 'package:customcalc/computations.dart';
+import 'package:customcalc/set-equation.dart';
 import 'package:flutter/material.dart';
 
 class AddRecord extends StatefulWidget {
@@ -45,7 +45,7 @@ class _AddRecordState extends State<AddRecord> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => new Computations(_params)));
+                          builder: (context) => new SetEquation(_params)));
                 else
                   print("Enter at least one field");
               }),
