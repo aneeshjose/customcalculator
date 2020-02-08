@@ -30,7 +30,7 @@ class _AddRecordState extends State<AddRecord> {
           FlatButton(
               child: Text("Done"),
               onPressed: () {
-                // print(_params);
+                //
                 bool isAllNull = true;
                 for (int j = 0; j < _controllers.length; j++) {
                   if (_controllers[j] != null) {
@@ -46,8 +46,6 @@ class _AddRecordState extends State<AddRecord> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => new SetEquation(_params)));
-                else
-                  print("Enter at least one field");
               }),
         ],
       ),
@@ -88,7 +86,7 @@ class _AddRecordState extends State<AddRecord> {
             new IconButton(
               icon: Icon(Icons.remove),
               onPressed: () {
-                // print(i);
+                //
                 _removeField(i);
               },
             ),
@@ -104,6 +102,5 @@ class _AddRecordState extends State<AddRecord> {
       _params[i] = null;
       _controllers[i] = null;
     });
-    print("${_computeParams.length},${_params.length},${_controllers.length}");
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:customcalc/core/supportclasses.dart';
 import 'package:flutter/material.dart';
 
@@ -11,14 +13,14 @@ class Calculate extends StatefulWidget {
 class _CalculateState extends State<Calculate> {
   Equations equations;
   List<String> variables = [];
-  double result = 0.0;
+  String result = "";
   Map<String, String> equMap = {};
   List<String> equList = [];
 
   // List<String> postfix = [];
   List<String> stack = [];
   List<String> operands = [];
-  List priority = ['-', '+', '/', '*', '^'];
+  List priorityList = ['-', '+', '/', '*', '^'];
 
   int top = -1;
 
@@ -31,7 +33,7 @@ class _CalculateState extends State<Calculate> {
     variables = equations.variables.split(',');
     equList = equations.equation.split(',');
     //
-    // priority = priority.reversed;
+    // priorityList = priorityList.reversed;
     //
   }
 
@@ -77,7 +79,10 @@ class _CalculateState extends State<Calculate> {
               );
             },
           ),
-          Text(result.toString()),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Center(child: Text("Result: $result")),
+          ),
           RaisedButton(
             child: Text("Compute"),
             onPressed: () => calculateResult(),
@@ -93,10 +98,15 @@ class _CalculateState extends State<Calculate> {
     stack = [];
     top = -1;
     postfix = convertToPostfix();
-    print(postfix);
+
     replaced = replaceVariables(postfix);
-    print(replaced);
-    calculate(replaced);
+    //
+    double res = calculate(replaced);
+    //
+    setState(() {
+      result = res.toString();
+    });
+    //
   }
 
   List convertToPostfix() {
@@ -104,10 +114,10 @@ class _CalculateState extends State<Calculate> {
     for (int i = 0; i < equList.length; i++) {
       if (equMap.containsKey(equList[i])) {
         postfix.add(equList[i]);
-      } else if (priority.contains(equList[i])) {
+      } else if (priorityList.contains(equList[i])) {
         if (top > -1)
           while (stack.length != 0 &&
-              prior(equList[i]) < prior(stack[top]) &&
+              priority(equList[i]) < priority(stack[top]) &&
               stack[top] != "(") {
             postfix.add(pop());
           }
@@ -138,11 +148,38 @@ class _CalculateState extends State<Calculate> {
   }
 
   double calculate(List replaced) {
-    return 0.0; //TODO implement
+    double res = 0.0;
+    for (int i = 0; i < replaced.length; i++) {
+      if (priorityList.contains(replaced[i])) {
+        try {
+          res =
+              computeRes(replaced[i], double.parse(pop()), double.parse(pop()));
+          push(res.toString());
+        } catch (e) {}
+      } else {
+        push(replaced[i]);
+      }
+    }
+
+    return double.parse(pop());
   }
 
-  int prior(String s) {
-    return priority.indexOf(s);
+  double computeRes(String operate, double oper1, double oper2) {
+    try {
+      if (operate == '+') return oper2 + oper1;
+      if (operate == '-') return oper2 - oper1;
+      if (operate == '/') return oper2 / oper1;
+      if (operate == '*') return oper2 * oper1;
+      if (operate == '^') return pow(oper2, oper1);
+    } catch (e) {
+      setState(() {
+        result = e;
+      });
+    }
+  }
+
+  int priority(String s) {
+    return priorityList.indexOf(s);
   }
 
   push(String s) {
@@ -154,19 +191,7 @@ class _CalculateState extends State<Calculate> {
     top = stack.length - 2;
     return stack.removeLast();
   }
-
-  void popTillPara() {
-    bool loop = true;
-    //
-
-    // while (loop) {
-    //
-    //   if (stack[top] == '(') {
-    //
-    //     loop = false;
-    //   } else {
-    //     postfix.add(pop());
-    //   }
-    // }
-  }
 }
+// class StrToD{
+//   double
+// }

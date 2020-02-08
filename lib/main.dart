@@ -155,9 +155,9 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     try {
       equList = await database.rawQuery('select * from equations ');
-      print(equList);
+      //
       database.close();
-      // print("Future done");
+      //
       for (int i = 0; i < equList.length; i++) {
         equations.add(Equations(equList[i]['name'], equList[i]['equation'],
             equList[i]['variables']));
@@ -165,7 +165,7 @@ class _MyHomePageState extends State<MyHomePage> {
       return equations;
     } catch (e) {
       database.close();
-      print(e);
+
       return null;
     }
   }
@@ -185,8 +185,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
       // await db.execute("create table trades(trade text primary key)");
       await batch.commit();
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
   }
 }

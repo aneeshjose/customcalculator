@@ -25,7 +25,7 @@ class _SetEquationState extends State<SetEquation> {
   void initState() {
     super.initState();
     params = widget.params;
-    // print(params);
+    //
 
     for (int k = 0; k < params.length; k++)
       if (params[k] != null)
@@ -59,7 +59,6 @@ class _SetEquationState extends State<SetEquation> {
             _calcString += params[j];
             _storeString +=
                 (_storeString.length == 0) ? params[j] : (',' + params[j]);
-            print(_storeString);
           });
         },
         child: Text(params[j]),
@@ -72,7 +71,7 @@ class _SetEquationState extends State<SetEquation> {
 
   @override
   Widget build(BuildContext context) {
-    // print(context);
+    //
     return Scaffold(
       appBar: AppBar(
         title: Text("Equation for calculation"),
@@ -135,7 +134,7 @@ class _SetEquationState extends State<SetEquation> {
                         ),
                         RaisedButton(
                           onPressed: () async {
-                            // print(context);
+                            //
                             if (compName == null || compName == '') {
                               setState(() {
                                 _errorMeassage =
@@ -164,8 +163,7 @@ class _SetEquationState extends State<SetEquation> {
 
                                 await batch.commit(noResult: true);
 
-                                print("Done");
-                                // print(context);
+                                //
                                 Scaffold.of(context).showSnackBar(SnackBar(
                                   content: Text("Added"),
                                   duration: Duration(seconds: 1),
@@ -174,7 +172,7 @@ class _SetEquationState extends State<SetEquation> {
                                     Duration(seconds: 2, milliseconds: 500),
                                     () {
                                   Navigator.pop(context);
-                                  // print("POP");
+                                  //
                                   Navigator.pop(context);
                                 });
                               } catch (e) {
@@ -182,7 +180,6 @@ class _SetEquationState extends State<SetEquation> {
                                   _errorMeassage =
                                       "The name entered already exists Try a new one";
                                 });
-                                print(e);
                               }
                             }
                           },
