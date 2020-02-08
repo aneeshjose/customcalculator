@@ -38,6 +38,7 @@ class _SetEquationState extends State<SetEquation> {
       "-",
       "*",
       "/",
+      '^',
       "1",
       "2",
       "3",

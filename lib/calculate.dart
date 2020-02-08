@@ -10,8 +10,18 @@ class Calculate extends StatefulWidget {
 
 class _CalculateState extends State<Calculate> {
   Equations equations;
-  List<String> variables = [], _params = [];
+  List<String> variables = [];
   double result = 0.0;
+  Map<String, String> equMap = {};
+  List<String> equList = [];
+
+  // List<String> postfix = [];
+  List<String> stack = [];
+  List<String> operands = [];
+  List priority = ['-', '+', '/', '*', '^'];
+
+  int top = -1;
+
   // Size size;
 
   @override
@@ -19,7 +29,10 @@ class _CalculateState extends State<Calculate> {
     super.initState();
     equations = widget.equations;
     variables = equations.variables.split(',');
-    print(variables);
+    equList = equations.equation.split(',');
+    //
+    // priority = priority.reversed;
+    //
   }
 
   @override
@@ -35,8 +48,8 @@ class _CalculateState extends State<Calculate> {
             builder: (context, snapshot) {
               List<Widget> _textFields = [];
               for (int k = 0; k < variables.length; k++) {
-                _params.add("");
-                print(_params);
+                // _params.add("");
+                //
                 _textFields.add(
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0, left: 20),
@@ -53,7 +66,7 @@ class _CalculateState extends State<Calculate> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        onChanged: (text) => _params[k] = text,
+                        onChanged: (text) => equMap[variables[k]] = text,
                       ),
                     ),
                   ),
@@ -74,5 +87,86 @@ class _CalculateState extends State<Calculate> {
     );
   }
 
-  calculateResult() {}
+  calculateResult() async {
+    List postfix = [];
+    List replaced = [];
+    stack = [];
+    top = -1;
+    postfix = convertToPostfix();
+    print(postfix);
+    replaced = replaceVariables(postfix);
+    print(replaced);
+    calculate(replaced);
+  }
+
+  List convertToPostfix() {
+    List postfix = [];
+    for (int i = 0; i < equList.length; i++) {
+      if (equMap.containsKey(equList[i])) {
+        postfix.add(equList[i]);
+      } else if (priority.contains(equList[i])) {
+        if (top > -1)
+          while (stack.length != 0 &&
+              prior(equList[i]) < prior(stack[top]) &&
+              stack[top] != "(") {
+            postfix.add(pop());
+          }
+        push(equList[i]);
+      } else if (equList[i] == '(') {
+        push('(');
+      } else if (equList[i] == ')') {
+        if (top > 0)
+          while (stack[top] != '(') {
+            postfix.add(pop());
+          }
+        pop();
+      }
+    }
+    while (top > -1) {
+      postfix.add(pop());
+    }
+    return postfix;
+  }
+
+  List replaceVariables(List postfix) {
+    for (int i = 0; i < postfix.length; i++) {
+      if (equMap.containsKey(postfix[i])) {
+        postfix[i] = equMap[postfix[i]];
+      }
+    }
+    return postfix;
+  }
+
+  double calculate(List replaced) {
+    return 0.0; //TODO implement
+  }
+
+  int prior(String s) {
+    return priority.indexOf(s);
+  }
+
+  push(String s) {
+    stack.add(s);
+    top = stack.length - 1;
+  }
+
+  String pop() {
+    top = stack.length - 2;
+    return stack.removeLast();
+  }
+
+  void popTillPara() {
+    bool loop = true;
+    //
+
+    // while (loop) {
+    //
+    //   if (stack[top] == '(') {
+    //
+    //     loop = false;
+    //   } else {
+    //     postfix.add(pop());
+    //   }
+    // }
+  }
 }
