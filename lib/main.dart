@@ -66,25 +66,37 @@ class _MyHomePageState extends State<MyHomePage> {
                   if (snapshot.data.length != 0) {
                     for (int i = 0; i < snapshot.data.length; i++) {
                       _savedWidgets.add(
-                        new FlatButton(
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        new Calculate(snapshot.data[i])));
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                                border: Border.all(color: Colors.green),
-                                // border: Border()
-                                borderRadius: BorderRadius.circular(5)),
-                            width: MediaQuery.of(context).size.width,
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Text(snapshot.data[i].name),
+                        Row(
+                          children: <Widget>[
+                            new FlatButton(
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            new Calculate(snapshot.data[i])));
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.green),
+                                    // border: Border()
+                                    borderRadius: BorderRadius.circular(5)),
+                                width: MediaQuery.of(context).size.width / 2,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Text(snapshot.data[i].name),
+                                ),
+                              ),
                             ),
-                          ),
+                            IconButton(
+                                icon: Icon(
+                                  Icons.delete_forever,
+                                  color: Colors.red,
+                                ),
+                                onPressed: () {
+                                  removeData(snapshot.data[i].name);
+                                })
+                          ],
                         ),
                       );
                     }
@@ -186,5 +198,24 @@ class _MyHomePageState extends State<MyHomePage> {
       // await db.execute("create table trades(trade text primary key)");
       await batch.commit();
     } catch (e) {}
+  }
+
+  Future<void> removeData(data) async {
+    var databasesPath = await getDatabasesPath();
+    String path = databasesPath + 'database.db';
+
+    Database database = await openDatabase(path, version: 1,
+        onCreate: (Database db, int version) async {
+      db.close();
+    });
+    // try {
+    database.rawQuery("delete from equations where name='$data'");
+    setState(() {
+      _savedOptions = _loadSavedOptions();
+    });
+    // } catch (e) {
+    //   print(e);
+    //   database.close();
+    // }
   }
 }
